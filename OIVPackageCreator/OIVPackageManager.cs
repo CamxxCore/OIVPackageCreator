@@ -17,7 +17,7 @@ namespace OIVPackageCreator
             this.version = version;
         }
 
-        public OIVPackageManager(string fileName) : this (fileName, OIVPackageFormat.OIVFormat_2)
+        public OIVPackageManager(string fileName) : this(fileName, OIVPackageFormat.OIVFormat_2)
         { }
 
         public void CreatePackage(OIVPackageInfo data)
@@ -367,7 +367,7 @@ namespace OIVPackageCreator
             {
                 writer.Formatting = Formatting.Indented;
                 xmlDoc.Save(writer);
-            }       
+            }
         }
 
         public static IEnumerable<OIVArchive> GetNodes(OIVArchive node)

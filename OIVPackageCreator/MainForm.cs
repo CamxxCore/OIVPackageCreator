@@ -10,12 +10,12 @@ namespace OIVPackageCreator
     public partial class MainForm : DevComponents.DotNetBar.Office2007Form
     {
         OIVPackageInfo info = new OIVPackageInfo();
+        bool wizardActive = false;
 
         public MainForm()
         {
             InitializeComponent();
             propertyGrid1.SetParent(this);
-            propertyGrid1.PropertyValueChanged += PropertyGrid1_PropertyValueChanged;
             superTabControl1.SelectedTabChanged += SelectedTabChanged;
             colorPickerButton1.SelectedColorChanged += ColorPickerButton1_SelectedColorChanged;
             colorPickerButton2.SelectedColorChanged += ColorPickerButton2_SelectedColorChanged;
@@ -25,18 +25,18 @@ namespace OIVPackageCreator
 
         private void ColorPickerButton1_SelectedColorChanged(object sender, EventArgs e)
         {
-            if (info == null) return;
-            info.IconBackground = colorPickerButton1.SelectedColor;
+            if (info != null)
+            {
+                info.IconBackground = colorPickerButton1.SelectedColor;
+            }
         }
 
         private void ColorPickerButton2_SelectedColorChanged(object sender, EventArgs e)
         {
-            if (info == null) return;
-            info.HeaderBackground = colorPickerButton2.SelectedColor;
-        }
-
-        private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
-        {
+            if (info != null)
+            {
+                info.HeaderBackground = colorPickerButton2.SelectedColor;
+            }
         }
 
         private void SelectedTabChanged(object sender, SuperTabStripSelectedTabChangedEventArgs e)
@@ -74,17 +74,17 @@ namespace OIVPackageCreator
             info = info ?? new OIVPackageInfo();
             info.GenericFiles.AddRange(files);
 
-            foreach (var oivFile in info.GenericFiles)
-                MessageBox.Show(string.Format("src: {0} dest: {1}", oivFile.Source, oivFile.Destination));
+            wizardActive = false;
         }
 
         private void ArchiveContentWz_Finished(object sender, OIVArchive archive)
         {
             var nodes = GetNodes(archive);
-            MessageBox.Show(nodes.Count().ToString());
+
             foreach (var ar in nodes)
             {
                 if (ar.SourceFiles == null) continue;
+
                 foreach (var f in ar.SourceFiles)
                 listBox1.Items.Add(string.Format("{0} -> {1}/{2}",
                     f.Source.Substring(f.Source.LastIndexOf('\\') + 1),
@@ -95,33 +95,28 @@ namespace OIVPackageCreator
             info = info ?? new OIVPackageInfo();
             info.Archives.Add(archive);
 
-            foreach (var oivFile in info.Archives)
-                MessageBox.Show(string.Format("path: {0} {1} {2}", oivFile.Path, oivFile.Version, oivFile.CreateIfNotExist));
-        }
-
-        private void buttonX3_Click(object sender, EventArgs e)
-        {
-            //export
-
-            if (info == null) return;
-
-            var oivpkg = new OIVPackageManager("package.oiv");
-
-            oivpkg.CreatePackage(info);
-        }
-
-        private void buttonX4_Click(object sender, EventArgs e)
-        {
-         
-            //     oivpkg.CreatePackage(info);
+            wizardActive = false;
         }
 
         private void buttonX5_Click(object sender, EventArgs e)
         {
-            var splash = new WizardSplashPage();
-            splash.GenericFileWizard.Finished += GenericContentWz_Finished;
-            splash.ArchiveFileWizard.Finished += ArchiveContentWz_Finished;
-            splash.Show();
+            if (!wizardActive)
+            {
+                var splash = new WizardSplashPage();
+                splash.FormClosed += WizardSplashPageClosed;
+                splash.GenericFileWizard.Finished += GenericContentWz_Finished;
+                splash.ArchiveFileWizard.Finished += ArchiveContentWz_Finished;
+                splash.Show();
+
+                wizardActive = true;
+            }
+
+            else MessageBox.Show("Another wizard is already running. Please complete it before starting a new one.");
+        }
+
+        private void WizardSplashPageClosed(object sender, EventArgs e)
+        {
+            wizardActive = false;
         }
 
         public static IEnumerable<OIVArchive> GetNodes(OIVArchive node)
@@ -137,6 +132,30 @@ namespace OIVPackageCreator
                 {
                     yield return innerN;
                 }
+            }
+        }
+
+
+        private void buttonX3_Click(object sender, EventArgs e)
+        {
+            if (info == null) return;
+
+            using (var sfd = new SaveFileDialog { Filter = "OpenIV Archive Files (*.oiv)|*.oiv|All files (*.*)|*.*" })
+            {
+                sfd.FileName = info.Name ?? "modname" + ".oiv";
+
+                var result = sfd.ShowDialog();
+
+                switch (result)
+                {
+                    case DialogResult.Cancel: break;
+                    case DialogResult.OK:
+                        var manager = new OIVPackageManager(sfd.FileName);
+                        manager.CreatePackage(info);
+                        break;
+                }
+
+                sfd.Dispose();
             }
         }
 
@@ -182,16 +201,6 @@ namespace OIVPackageCreator
 
             foreach (var a in info.Archives)
             {
-               /* a.NestedArchives.ForEach(x => x.SourceFiles.ForEach(y => listBox1.Items.Add(string.Format("{0} -> {1}/{2}",
-                        y.Source.Substring(y.Source.LastIndexOf('\\') + 1),
-                        a.Path,
-                        y.Name))));*/
-
-               // foreach (var nested in a.NestedArchives)
-              //  {
-//
-              //  }
-
                 foreach (var f in a.SourceFiles)
                     listBox1.Items.Add(string.Format("{0} -> {1}/{2}",
                         f.Source.Substring(f.Source.LastIndexOf('\\') + 1),
@@ -199,6 +208,9 @@ namespace OIVPackageCreator
                         f.Name));
             }
 
+            colorPickerButton1.SelectedColor = info.IconBackground;
+
+            colorPickerButton2.SelectedColor = info.HeaderBackground;
         }
     }
 }
