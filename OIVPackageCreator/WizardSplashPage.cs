@@ -23,6 +23,12 @@ namespace OIVPackageCreator
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (ArchiveFileWizard.Active || GenericFileWizard.Active)
+            {
+                MessageBox.Show("Another wizard is already running. Please complete it before starting a new one.");
+                return;
+            }
+
             if (radioButton1.Checked)
             {
                 ArchiveFileWizard.Show();

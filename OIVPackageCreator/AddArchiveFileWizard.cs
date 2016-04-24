@@ -15,6 +15,8 @@ namespace OIVPackageCreator
 
     public partial class AddArchiveFileWizard : Form
     {
+        public bool Active { get; set; }
+
         private OIVArchive archive =
           new OIVArchive();
 
@@ -27,12 +29,12 @@ namespace OIVPackageCreator
         public AddArchiveFileWizard()
         {
             InitializeComponent();
-            wizard1.CancelButtonClick += Wizard1_CancelButtonClick1;
-            wizard1.FinishButtonClick += Wizard1_FinishButtonClick;
-            wizardPage3.NextButtonClick += WizardPage3_NextButtonClick;
+            wizard1.CancelButtonClick += CancelButtonClick1;
+            wizard1.FinishButtonClick += FinishButtonClick;
+            wizardPage3.NextButtonClick += NextButtonClick;
         }
 
-        private void WizardPage3_NextButtonClick(object sender, CancelEventArgs e)
+        private void NextButtonClick(object sender, CancelEventArgs e)
         {
            var selected = panel1.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked);
 
@@ -50,7 +52,7 @@ namespace OIVPackageCreator
             archive.Version = type;
         }
 
-        private void Wizard1_FinishButtonClick(object sender, CancelEventArgs e)
+        private void FinishButtonClick(object sender, CancelEventArgs e)
         {
             string fullPath = textBox1.Text;
 
@@ -84,16 +86,6 @@ namespace OIVPackageCreator
             Close();
         }
 
-        private void Wizard1_CancelButtonClick1(object sender, CancelEventArgs e)
-        {
-            Close();
-        }
-
-       /* private void TextBox1_TextChanged(object sender, EventArgs e)
-        {
-            fullPath = textBox1.Text;
-        }*/
-
         private void button1_Click(object sender, EventArgs e)
         {
             using (var ofd = new OpenFileDialog() { Multiselect = true })
@@ -106,7 +98,6 @@ namespace OIVPackageCreator
                     case DialogResult.OK:
                         foreach (var file in ofd.FileNames)
                             files.Add(file);
-                          //  archive.Add(file, file.Substring(file.LastIndexOf("\\") + 1));
                         break;
                 }
 
@@ -123,6 +114,23 @@ namespace OIVPackageCreator
                 listBox1.Items.Add(filename);
                 listBox2.Items.Add(filename);
             }
+        }
+       
+        protected override void OnShown(EventArgs e)
+        {
+            Active = true;
+            base.OnShown(e);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            Active = false;
+            base.OnClosed(e);
+        }
+
+        private void CancelButtonClick1(object sender, CancelEventArgs e)
+        {
+            Close();
         }
     }
 }

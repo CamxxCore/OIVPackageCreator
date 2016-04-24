@@ -24,7 +24,7 @@ namespace OIVPackageCreator
         [DisplayName("ID")]
         [Description("The unique identifier of the package. (Readonly)")]
         [Required(ErrorMessage = "PackageAttributes.ID is required.")]
-        public string ID { get; internal set; } = string.Format("{0}", Guid.NewGuid().ToString("B"));
+        public string ID { get; internal set; } = Guid.NewGuid().ToString("B");
 
         [Browsable(true)]
         [ReadOnly(false)]

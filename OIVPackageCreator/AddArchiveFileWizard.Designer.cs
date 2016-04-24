@@ -305,7 +305,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AddArchiveFileWizard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Add Content Wizard";
+            this.Text = "Add Archive File Wizard";
             this.wizard1.ResumeLayout(false);
             this.wizardPage3.ResumeLayout(false);
             this.panel1.ResumeLayout(false);

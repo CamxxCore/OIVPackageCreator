@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>OpenIV.ico</ApplicationIcon>
+    <ApplicationIcon>package-x-generic.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DevComponents.DotNetBar2, Version=10.0.0.3, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="OpenIV.ico" />
+    <Content Include="package-x-generic.ico" />
     <None Include="Resources\2000px-Plus_blue.svg.png" />
   </ItemGroup>
   <ItemGroup />

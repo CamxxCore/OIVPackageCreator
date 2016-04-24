@@ -203,7 +203,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AddGenericFileWizard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Add Content Wizard";
+            this.Text = "Add Generic File Wizard";
             this.wizard1.ResumeLayout(false);
             this.wizardPage2.ResumeLayout(false);
             this.wizardPage3.ResumeLayout(false);
