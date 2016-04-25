@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public delegate void GenericFileWizardFinishedDelegate(object sender, OIVGenericFile[] files);
 
@@ -12,8 +12,7 @@ namespace OIVPackageCreator
     {
         public bool Active { get; set; }
 
-        private List<OIVGenericFile> files =
-            new List<OIVGenericFile>();
+        private List<OIVGenericFile> files = new List<OIVGenericFile>();
 
         public event GenericFileWizardFinishedDelegate Finished;
 

@@ -1,4 +1,4 @@
-﻿namespace OIVPackageCreator
+﻿namespace OIVPackageEditor
 {
     partial class MainForm
     {
@@ -32,6 +32,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.styleManager1 = new DevComponents.DotNetBar.StyleManager(this.components);
             this.superTabControl1 = new DevComponents.DotNetBar.SuperTabControl();
+            this.superTabControlPanel3 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.buttonX1 = new DevComponents.DotNetBar.ButtonX();
+            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.buttonX5 = new DevComponents.DotNetBar.ButtonX();
+            this.superTabItem2 = new DevComponents.DotNetBar.SuperTabItem();
+            this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
+            this.propertyGrid1 = new OIVPackageEditor.TabbedPropertyGrid();
+            this.Metadata = new DevComponents.DotNetBar.SuperTabItem();
             this.superTabControlPanel2 = new DevComponents.DotNetBar.SuperTabControlPanel();
             this.colorPickerButton2 = new DevComponents.DotNetBar.ColorPickerButton();
             this.colorPickerButton1 = new DevComponents.DotNetBar.ColorPickerButton();
@@ -39,18 +47,11 @@
             this.buttonX2 = new DevComponents.DotNetBar.ButtonX();
             this.reflectionLabel1 = new DevComponents.DotNetBar.Controls.ReflectionLabel();
             this.superTabItem1 = new DevComponents.DotNetBar.SuperTabItem();
-            this.superTabControlPanel1 = new DevComponents.DotNetBar.SuperTabControlPanel();
-            this.Metadata = new DevComponents.DotNetBar.SuperTabItem();
-            this.superTabControlPanel3 = new DevComponents.DotNetBar.SuperTabControlPanel();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.buttonX5 = new DevComponents.DotNetBar.ButtonX();
-            this.superTabItem2 = new DevComponents.DotNetBar.SuperTabItem();
-            this.propertyGrid1 = new OIVPackageCreator.TabbedPropertyGrid();
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).BeginInit();
             this.superTabControl1.SuspendLayout();
-            this.superTabControlPanel2.SuspendLayout();
-            this.superTabControlPanel1.SuspendLayout();
             this.superTabControlPanel3.SuspendLayout();
+            this.superTabControlPanel1.SuspendLayout();
+            this.superTabControlPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // styleManager1
@@ -95,6 +96,95 @@
             this.superTabControl1.TabStyle = DevComponents.DotNetBar.eSuperTabStyle.Office2010BackstageBlue;
             this.superTabControl1.Text = "tabControl";
             // 
+            // superTabControlPanel3
+            // 
+            this.superTabControlPanel3.Controls.Add(this.buttonX1);
+            this.superTabControlPanel3.Controls.Add(this.listBox1);
+            this.superTabControlPanel3.Controls.Add(this.buttonX5);
+            this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel3.Location = new System.Drawing.Point(0, 23);
+            this.superTabControlPanel3.Name = "superTabControlPanel3";
+            this.superTabControlPanel3.Size = new System.Drawing.Size(528, 521);
+            this.superTabControlPanel3.TabIndex = 0;
+            this.superTabControlPanel3.TabItem = this.superTabItem2;
+            // 
+            // buttonX1
+            // 
+            this.buttonX1.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.buttonX1.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.buttonX1.Image = global::OIVPackageEditor.Properties.Resources.Minus_blue_svg;
+            this.buttonX1.ImageFixedSize = new System.Drawing.Size(20, 23);
+            this.buttonX1.ImagePosition = DevComponents.DotNetBar.eImagePosition.Bottom;
+            this.buttonX1.Location = new System.Drawing.Point(19, 63);
+            this.buttonX1.Name = "buttonX1";
+            this.buttonX1.Size = new System.Drawing.Size(36, 32);
+            this.buttonX1.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.buttonX1.TabIndex = 11;
+            this.buttonX1.Click += new System.EventHandler(this.buttonX1_Click);
+            // 
+            // listBox1
+            // 
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.HorizontalScrollbar = true;
+            this.listBox1.Location = new System.Drawing.Point(68, 17);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(437, 290);
+            this.listBox1.TabIndex = 10;
+            // 
+            // buttonX5
+            // 
+            this.buttonX5.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.buttonX5.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
+            this.buttonX5.Image = global::OIVPackageEditor.Properties.Resources.Plus_blue_svg;
+            this.buttonX5.ImageFixedSize = new System.Drawing.Size(20, 23);
+            this.buttonX5.ImagePosition = DevComponents.DotNetBar.eImagePosition.Bottom;
+            this.buttonX5.Location = new System.Drawing.Point(19, 22);
+            this.buttonX5.Name = "buttonX5";
+            this.buttonX5.Size = new System.Drawing.Size(36, 32);
+            this.buttonX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
+            this.buttonX5.TabIndex = 9;
+            this.buttonX5.Click += new System.EventHandler(this.buttonX5_Click);
+            // 
+            // superTabItem2
+            // 
+            this.superTabItem2.AttachedControl = this.superTabControlPanel3;
+            this.superTabItem2.GlobalItem = false;
+            this.superTabItem2.Name = "superTabItem2";
+            this.superTabItem2.Text = "Content";
+            // 
+            // superTabControlPanel1
+            // 
+            this.superTabControlPanel1.Controls.Add(this.propertyGrid1);
+            this.superTabControlPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.superTabControlPanel1.Location = new System.Drawing.Point(0, 23);
+            this.superTabControlPanel1.Name = "superTabControlPanel1";
+            this.superTabControlPanel1.Size = new System.Drawing.Size(528, 521);
+            this.superTabControlPanel1.TabIndex = 1;
+            this.superTabControlPanel1.TabItem = this.Metadata;
+            // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
+            this.propertyGrid1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.propertyGrid1.CommandsBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.propertyGrid1.CommandsForeColor = System.Drawing.Color.Black;
+            this.propertyGrid1.ForeColor = System.Drawing.Color.Black;
+            this.propertyGrid1.HelpBackColor = System.Drawing.Color.White;
+            this.propertyGrid1.HelpForeColor = System.Drawing.Color.Black;
+            this.propertyGrid1.Location = new System.Drawing.Point(5, 4);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(518, 512);
+            this.propertyGrid1.TabIndex = 5;
+            this.propertyGrid1.ViewBackColor = System.Drawing.Color.White;
+            this.propertyGrid1.ViewForeColor = System.Drawing.Color.Black;
+            // 
+            // Metadata
+            // 
+            this.Metadata.AttachedControl = this.superTabControlPanel1;
+            this.Metadata.GlobalItem = false;
+            this.Metadata.Name = "Metadata";
+            this.Metadata.Text = "Metadata";
+            // 
             // superTabControlPanel2
             // 
             this.superTabControlPanel2.Controls.Add(this.colorPickerButton2);
@@ -103,9 +193,9 @@
             this.superTabControlPanel2.Controls.Add(this.buttonX2);
             this.superTabControlPanel2.Controls.Add(this.reflectionLabel1);
             this.superTabControlPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel2.Location = new System.Drawing.Point(0, 23);
+            this.superTabControlPanel2.Location = new System.Drawing.Point(0, 0);
             this.superTabControlPanel2.Name = "superTabControlPanel2";
-            this.superTabControlPanel2.Size = new System.Drawing.Size(528, 521);
+            this.superTabControlPanel2.Size = new System.Drawing.Size(528, 544);
             this.superTabControlPanel2.TabIndex = 0;
             this.superTabControlPanel2.TabItem = this.superTabItem1;
             // 
@@ -180,80 +270,6 @@
             this.superTabItem1.Name = "superTabItem1";
             this.superTabItem1.Text = "Import / Export";
             // 
-            // superTabControlPanel1
-            // 
-            this.superTabControlPanel1.Controls.Add(this.propertyGrid1);
-            this.superTabControlPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel1.Location = new System.Drawing.Point(0, 23);
-            this.superTabControlPanel1.Name = "superTabControlPanel1";
-            this.superTabControlPanel1.Size = new System.Drawing.Size(528, 521);
-            this.superTabControlPanel1.TabIndex = 1;
-            this.superTabControlPanel1.TabItem = this.Metadata;
-            // 
-            // Metadata
-            // 
-            this.Metadata.AttachedControl = this.superTabControlPanel1;
-            this.Metadata.GlobalItem = false;
-            this.Metadata.Name = "Metadata";
-            this.Metadata.Text = "Metadata";
-            // 
-            // superTabControlPanel3
-            // 
-            this.superTabControlPanel3.Controls.Add(this.listBox1);
-            this.superTabControlPanel3.Controls.Add(this.buttonX5);
-            this.superTabControlPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.superTabControlPanel3.Location = new System.Drawing.Point(0, 23);
-            this.superTabControlPanel3.Name = "superTabControlPanel3";
-            this.superTabControlPanel3.Size = new System.Drawing.Size(528, 521);
-            this.superTabControlPanel3.TabIndex = 0;
-            this.superTabControlPanel3.TabItem = this.superTabItem2;
-            // 
-            // listBox1
-            // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.HorizontalScrollbar = true;
-            this.listBox1.Location = new System.Drawing.Point(68, 17);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(437, 290);
-            this.listBox1.TabIndex = 10;
-            // 
-            // buttonX5
-            // 
-            this.buttonX5.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
-            this.buttonX5.ColorTable = DevComponents.DotNetBar.eButtonColor.OrangeWithBackground;
-            this.buttonX5.Image = global::OIVPackageCreator.Properties.Resources._2000px_Plus_blue_svg;
-            this.buttonX5.ImageFixedSize = new System.Drawing.Size(20, 23);
-            this.buttonX5.ImagePosition = DevComponents.DotNetBar.eImagePosition.Bottom;
-            this.buttonX5.Location = new System.Drawing.Point(21, 19);
-            this.buttonX5.Name = "buttonX5";
-            this.buttonX5.Size = new System.Drawing.Size(36, 32);
-            this.buttonX5.Style = DevComponents.DotNetBar.eDotNetBarStyle.StyleManagerControlled;
-            this.buttonX5.TabIndex = 9;
-            this.buttonX5.Click += new System.EventHandler(this.buttonX5_Click);
-            // 
-            // superTabItem2
-            // 
-            this.superTabItem2.AttachedControl = this.superTabControlPanel3;
-            this.superTabItem2.GlobalItem = false;
-            this.superTabItem2.Name = "superTabItem2";
-            this.superTabItem2.Text = "Content";
-            // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
-            this.propertyGrid1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.propertyGrid1.CommandsBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.propertyGrid1.CommandsForeColor = System.Drawing.Color.Black;
-            this.propertyGrid1.ForeColor = System.Drawing.Color.Black;
-            this.propertyGrid1.HelpBackColor = System.Drawing.Color.White;
-            this.propertyGrid1.HelpForeColor = System.Drawing.Color.Black;
-            this.propertyGrid1.Location = new System.Drawing.Point(5, 4);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(518, 512);
-            this.propertyGrid1.TabIndex = 5;
-            this.propertyGrid1.ViewBackColor = System.Drawing.Color.White;
-            this.propertyGrid1.ViewForeColor = System.Drawing.Color.Black;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -265,12 +281,12 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "MainForm";
-            this.Text = "OpenIV Package Creator";
+            this.Text = "OpenIV Package Editor";
             ((System.ComponentModel.ISupportInitialize)(this.superTabControl1)).EndInit();
             this.superTabControl1.ResumeLayout(false);
-            this.superTabControlPanel2.ResumeLayout(false);
-            this.superTabControlPanel1.ResumeLayout(false);
             this.superTabControlPanel3.ResumeLayout(false);
+            this.superTabControlPanel1.ResumeLayout(false);
+            this.superTabControlPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -292,6 +308,7 @@
         private DevComponents.DotNetBar.ButtonX buttonX3;
         private DevComponents.DotNetBar.ButtonX buttonX5;
         private System.Windows.Forms.ListBox listBox1;
+        private DevComponents.DotNetBar.ButtonX buttonX1;
     }
 }
 

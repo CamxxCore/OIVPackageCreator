@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public class OIVArchive
     {
@@ -34,8 +34,6 @@ namespace OIVPackageCreator
         {
             SourceFiles.Add(new OIVArchiveFile(this, sourcePath, name));
         }
-
-
     }
 
     public enum RageArchiveType

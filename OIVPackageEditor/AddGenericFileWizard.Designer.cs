@@ -1,4 +1,4 @@
-﻿namespace OIVPackageCreator
+﻿namespace OIVPackageEditor
 {
     partial class AddGenericFileWizard
     {

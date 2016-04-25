@@ -4,7 +4,7 @@ using System.Xml;
 using System;
 using System.Collections.Generic;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public sealed class OIVPackageManager
     {
@@ -234,6 +234,8 @@ namespace OIVPackageCreator
                 element.AppendChild(cData);
             }
 
+            #endregion
+
             #region colors
 
             subNode = xmlDoc.CreateElement("colors");
@@ -323,7 +325,7 @@ namespace OIVPackageCreator
 
                     foreach (var n in file.NestedArchives)
                     {
-                        foreach (var innerN in GetNodes(n))
+                        foreach (var innerN in GetNestedArchives(n))
                         {
                             element1 = xmlDoc.CreateElement("archive");
                             element.AppendChild(element1);
@@ -361,8 +363,6 @@ namespace OIVPackageCreator
                 }
             }
 
-            #endregion
-
             using (XmlTextWriter writer = new XmlTextWriter(filePath, null))
             {
                 writer.Formatting = Formatting.Indented;
@@ -370,7 +370,7 @@ namespace OIVPackageCreator
             }
         }
 
-        public static IEnumerable<OIVArchive> GetNodes(OIVArchive node)
+        public static IEnumerable<OIVArchive> GetNestedArchives(OIVArchive node)
         {
             if (node == null)
             {
@@ -379,7 +379,7 @@ namespace OIVPackageCreator
             yield return node;
             foreach (var n in node.NestedArchives)
             {
-                foreach (var innerN in GetNodes(n))
+                foreach (var innerN in GetNestedArchives(n))
                 {
                     yield return innerN;
                 }
@@ -398,7 +398,7 @@ namespace OIVPackageCreator
 
             foreach (var n in node.NestedArchives)
             {
-                foreach (var innerN in GetNodes(n))
+                foreach (var innerN in GetNestedArchives(n))
                 {
                     foreach (var file in innerN.SourceFiles)
                         yield return file;
@@ -427,10 +427,6 @@ namespace OIVPackageCreator
                 {
                     foreach (var archive in data.Archives)
                     {
-                        //  foreach (var sourceFile in archive.SourceFiles)
-                        //   {
-                        //      zipfile.CreateEntryFromFile(sourceFile.Source, "content/rpf/" + archive.Path + "/" + sourceFile.Name);
-                        //   }
                         foreach (var file in GetNestedFiles(archive))
                         {
                             zipfile.CreateEntryFromFile(file.Source, "content/rpf/" + archive.Path + "/" + file.Name);
@@ -439,6 +435,33 @@ namespace OIVPackageCreator
                 }
 
                 zipfile.Dispose();
+            }
+        }
+
+        private static void GetArchiveChildren(string filePath, XmlNode node, ref OIVArchive root)
+        {
+            foreach (XmlNode subNode in node.ChildNodes)
+            {
+                if (subNode.Name == "add")
+                {
+                    root?.Add(filePath + "content\\" + subNode.Attributes.GetNamedItem("source").Value,
+                        subNode.InnerText);
+                }
+
+                else if (subNode.Name == "archive")
+                {
+                    var archive = new OIVArchive();
+
+                    archive.Path = subNode.Attributes.GetNamedItem("path").Value.Replace('\\', '/');
+
+                    archive.CreateIfNotExist = Convert.ToBoolean(subNode.Attributes.GetNamedItem("createIfNotExist").Value);
+
+                    archive.Version = (RageArchiveType)Enum.Parse(typeof(RageArchiveType), subNode.Attributes.GetNamedItem("type").Value);
+
+                    root.NestedArchives.Add(archive);
+
+                    GetArchiveChildren(filePath, subNode, ref archive);
+                }
             }
         }
 
@@ -549,21 +572,15 @@ namespace OIVPackageCreator
                 {
                     var archive = new OIVArchive();
 
-                    archive.Path = node.Attributes.GetNamedItem("path").Value;
+                    archive.Path = node.Attributes.GetNamedItem("path").Value.Replace('\\', '/');
 
                     archive.CreateIfNotExist = Convert.ToBoolean(node.Attributes.GetNamedItem("createIfNotExist").Value);
 
                     archive.Version = (RageArchiveType)Enum.Parse(typeof(RageArchiveType), node.Attributes.GetNamedItem("type").Value);
 
-                    foreach (XmlNode subNode in node.ChildNodes)
-                    {
-                        if (subNode.Name == "add")
-                        {
-                            archive.SourceFiles.Add(new OIVArchiveFile(archive,
-                                filePath + "content\\" + subNode.Attributes.GetNamedItem("source").Value,
-                                subNode.InnerText));
-                        }
-                    }
+                    GetArchiveChildren(filePath, node, ref archive);
+
+                    info.Archives.Add(archive);
                 }
             }
 

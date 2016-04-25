@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public class TabbedPropertyGrid : PropertyGrid
     {

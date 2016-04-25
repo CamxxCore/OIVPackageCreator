@@ -4,12 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public class OIVArchiveFile
     {
         public string Source { get; set; }
         public string Name { get; set; }
+
+        public string FullPath
+        {
+            get
+            {
+                return string.Format("{0}/{1}", Parent.Path, Name);
+            }
+        }
 
         public OIVArchive Parent { get; set; }
 

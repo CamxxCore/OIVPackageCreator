@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OIVPackageCreator.Properties {
+namespace OIVPackageEditor.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace OIVPackageCreator.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OIVPackageCreator.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OIVPackageEditor.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,9 +63,19 @@ namespace OIVPackageCreator.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _2000px_Plus_blue_svg {
+        internal static System.Drawing.Bitmap Minus_blue_svg {
             get {
-                object obj = ResourceManager.GetObject("2000px-Plus_blue.svg", resourceCulture);
+                object obj = ResourceManager.GetObject("Minus_blue_svg", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Plus_blue_svg {
+            get {
+                object obj = ResourceManager.GetObject("Plus_blue_svg", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

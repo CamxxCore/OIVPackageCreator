@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public sealed class OIVPackageInfo
     {

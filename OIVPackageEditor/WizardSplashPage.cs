@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public partial class WizardSplashPage : Form
     {

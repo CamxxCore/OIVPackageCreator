@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public partial class MainForm : DevComponents.DotNetBar.Office2007Form
     {
@@ -79,17 +79,15 @@ namespace OIVPackageCreator
 
         private void ArchiveContentWz_Finished(object sender, OIVArchive archive)
         {
-            var nodes = GetNodes(archive);
-
-            foreach (var ar in nodes)
+            foreach (var ar in archive.GetNodes())
             {
                 if (ar.SourceFiles == null) continue;
 
                 foreach (var f in ar.SourceFiles)
-                listBox1.Items.Add(string.Format("{0} -> {1}/{2}",
-                    f.Source.Substring(f.Source.LastIndexOf('\\') + 1),
-                    ar.Path,
-                    f.Name));
+                    listBox1.Items.Add(string.Format("{0} -> {1}/{2}",
+                        f.Source.Substring(f.Source.LastIndexOf('\\') + 1),
+                        ar.Path,
+                        f.Name));
             }
 
             info = info ?? new OIVPackageInfo();
@@ -103,7 +101,9 @@ namespace OIVPackageCreator
             if (!wizardActive)
             {
                 var splash = new WizardSplashPage();
-                splash.FormClosed += WizardSplashPageClosed;
+                splash.FormClosed += OnWizardExit;
+                splash.GenericFileWizard.FormClosed += OnWizardExit;
+                splash.ArchiveFileWizard.FormClosed += OnWizardExit;
                 splash.GenericFileWizard.Finished += GenericContentWz_Finished;
                 splash.ArchiveFileWizard.Finished += ArchiveContentWz_Finished;
                 splash.Show();
@@ -114,27 +114,10 @@ namespace OIVPackageCreator
             else MessageBox.Show("Another wizard is already running. Please complete it before starting a new one.");
         }
 
-        private void WizardSplashPageClosed(object sender, EventArgs e)
+        private void OnWizardExit(object sender, EventArgs e)
         {
             wizardActive = false;
         }
-
-        public static IEnumerable<OIVArchive> GetNodes(OIVArchive node)
-        {
-            if (node == null)
-            {
-                yield break;
-            }
-            yield return node;
-            foreach (var n in node.NestedArchives)
-            {
-                foreach (var innerN in GetNodes(n))
-                {
-                    yield return innerN;
-                }
-            }
-        }
-
 
         private void buttonX3_Click(object sender, EventArgs e)
         {
@@ -201,16 +184,35 @@ namespace OIVPackageCreator
 
             foreach (var a in info.Archives)
             {
-                foreach (var f in a.SourceFiles)
-                    listBox1.Items.Add(string.Format("{0} -> {1}/{2}",
+                foreach (var f in a.GetNestedFiles())
+                    listBox1.Items.Add(string.Format("{0} -> {1}",
                         f.Source.Substring(f.Source.LastIndexOf('\\') + 1),
-                        a.Path,
-                        f.Name));
+                        f.FullPath));
             }
 
             colorPickerButton1.SelectedColor = info.IconBackground;
 
             colorPickerButton2.SelectedColor = info.HeaderBackground;
+        }
+
+        private void buttonX1_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedIndex < 0) return;
+
+            List<OIVArchiveFile> foundFiles = new List<OIVArchiveFile>();
+
+            foreach (var a in info.Archives)
+            {
+                foreach (var f in a.GetNestedFiles())
+                    if ((listBox1.SelectedItem as string).Contains(f.FullPath))
+                        foundFiles.Add(f);
+            }
+
+            if (foundFiles.Count <= 0) return;
+
+            foundFiles.ForEach(x => x.Parent.SourceFiles.Remove(x));
+
+            listBox1.Items.RemoveAt(listBox1.SelectedIndex);
         }
     }
 }

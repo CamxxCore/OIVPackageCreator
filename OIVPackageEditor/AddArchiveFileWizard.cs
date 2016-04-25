@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace OIVPackageCreator
+namespace OIVPackageEditor
 {
     public delegate void ArchiveFileWizardFinishedDelegate(object sender, OIVArchive archive);
 
@@ -17,8 +17,7 @@ namespace OIVPackageCreator
     {
         public bool Active { get; set; }
 
-        private OIVArchive archive =
-          new OIVArchive();
+        private OIVArchive archive = new OIVArchive();
 
         private List<string> files = new List<string>();
 
@@ -54,7 +53,13 @@ namespace OIVPackageCreator
 
         private void FinishButtonClick(object sender, CancelEventArgs e)
         {
-            string fullPath = textBox1.Text;
+            string fullPath = textBox1.Text.Trim();
+
+            if (fullPath.Length <= 0)
+            {
+                MessageBox.Show("Invalid archive path.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             int startIndex = 0;
             int endIndex = 0;
