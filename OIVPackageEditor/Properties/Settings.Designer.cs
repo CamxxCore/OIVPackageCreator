@@ -22,5 +22,27 @@ namespace OIVPackageEditor.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Windows.Forms.AutoCompleteStringCollection autoCompArcPaths {
+            get {
+                return ((global::System.Windows.Forms.AutoCompleteStringCollection)(this["autoCompArcPaths"]));
+            }
+            set {
+                this["autoCompArcPaths"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Windows.Forms.AutoCompleteStringCollection autoCompGenPaths {
+            get {
+                return ((global::System.Windows.Forms.AutoCompleteStringCollection)(this["autoCompGenPaths"]));
+            }
+            set {
+                this["autoCompGenPaths"] = value;
+            }
+        }
     }
 }

@@ -2,42 +2,106 @@
 using System.IO.Compression;
 using System.Xml;
 using System;
-using System.Collections.Generic;
+using System.Drawing;
+using System.Threading.Tasks;
 
 namespace OIVPackageEditor
 {
-    public sealed class OIVPackageManager
+    public sealed class OIVPackageManager : IDisposable
     {
-        private string filename;
+        private string filePath;
+
+        private string workingDir = Path.GetTempPath() + "\\" + Guid.NewGuid().ToString() + "\\";
+
         private OIVPackageFormat version;
 
-        public OIVPackageManager(string filename, OIVPackageFormat version)
+        public OIVPackageManager(string filePath, OIVPackageFormat version)
         {
-            this.filename = filename;
+            this.filePath = filePath;
             this.version = version;
+            SetupWorkingDir();
         }
 
-        public OIVPackageManager(string fileName) : this(fileName, OIVPackageFormat.OIVFormat_2)
+        public OIVPackageManager(string filePath) : this(filePath, OIVPackageFormat.OIVFormat_2)
         { }
 
-        public void CreatePackage(OIVPackageInfo data)
+        private void SetupWorkingDir()
         {
-            var mdPath = Path.GetTempPath() + "assembly.xml";
-            WriteXMLMetadata(mdPath, data);
-            WriteFileContent(filename, mdPath, data);
+            RemoveWorkingDir();
+
+            try
+            {
+                Directory.CreateDirectory(workingDir);
+            }
+
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine("Failed to create application working directory.\n" + e.Message);
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to create application working directory.\n" + e.Message);
+            }
         }
 
-        public OIVPackageInfo ReadPackage()
+        private void RemoveWorkingDir()
         {
-            var path = Path.GetTempPath() + "\\" + Guid.NewGuid().ToString() + "\\";
+            if (Directory.Exists(workingDir))
+            {
+                try
+                {
+                    Directory.Delete(workingDir, true);
+                }
 
-            if (Directory.Exists(path)) Directory.Delete(path);
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine("Failed to extract the package to application working directory. Access to the path was denied.");
+                }
 
-            ZipFile.ExtractToDirectory(filename, path);
+                catch (Exception e)
+                {
+                    Console.WriteLine("Failed to remove application working directory.\n" + e.Message);
+                }
+            }
+        }
 
-            OIVPackageInfo info;
-            ReadXMLMetadata(path, out info);
-            return info;
+        public async Task ExportPackage(OIVPackageInfo data)
+        {
+            WriteXMLMetadata(data);
+            await Task.Run(() => WriteFileContent(filePath, data));
+        }
+
+        public async Task<OIVPackageInfo> ReadPackage()
+        {
+            try
+            {
+                await Task.Run(() => ZipFile.ExtractToDirectory(filePath, workingDir));
+
+                OIVPackageInfo info;
+                ReadXMLMetadata(workingDir, out info);
+
+                string iconPath = workingDir + "icon.png";
+
+                if (File.Exists(iconPath))
+                {
+                    info.IconPath = iconPath;
+                }
+
+                return info;
+            }
+
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine("Failed to extract the package to application working directory. Access to the path was denied.");
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to remove application working directory.\n" + e.Message);
+                return null;
+            }
         }
 
         /// <summary>
@@ -45,10 +109,12 @@ namespace OIVPackageEditor
         /// </summary>
         /// <param name="relativePath"></param>
         /// <param name="data"></param>
-        private void WriteXMLMetadata(string filePath, OIVPackageInfo data)
+        private void WriteXMLMetadata(OIVPackageInfo data)
         {
             if (version != OIVPackageFormat.OIVFormat_2)
                 throw new InvalidDataException("Wrong package format.");
+
+            string filePath = workingDir + "assembly.xml";
 
             var xmlDoc = new XmlDocument();
 
@@ -279,59 +345,59 @@ namespace OIVPackageEditor
 
                     attribute = xmlDoc.CreateAttribute("source");
 
-                    attribute.Value = "file\\" + file.Destination.Replace('/', '\\');
+                    attribute.Value = "file\\" + file.Destination.TrimEnd('\\');
 
                     element.Attributes.Append(attribute);
 
-                    element.InnerText = file.Destination;
+                    element.InnerText = file.Destination.TrimEnd('\\');
                 }
             }
 
             if (!ReferenceEquals(data.Archives, null))
             {
-                foreach (var file in data.Archives)
+                foreach (var arc in data.Archives)
                 {
                     element = xmlDoc.CreateElement("archive");
                     subNode.AppendChild(element);
 
                     attribute = xmlDoc.CreateAttribute("path");
-                    attribute.Value = file.Path.Replace('/', '\\');
+                    attribute.Value = arc.Path;
 
                     element.Attributes.Append(attribute);
 
                     attribute = xmlDoc.CreateAttribute("createIfNotExist");
-                    attribute.Value = file.CreateIfNotExist.ToString();
+                    attribute.Value = arc.CreateIfNotExist.ToString();
 
                     element.Attributes.Append(attribute);
 
                     attribute = xmlDoc.CreateAttribute("type");
-                    attribute.Value = file.Version.ToString();
+                    attribute.Value = arc.Version.ToString();
 
                     element.Attributes.Append(attribute);
 
-                    foreach (var source in file.SourceFiles)
+                    foreach (var source in arc.SourceFiles)
                     {
                         element1 = xmlDoc.CreateElement("add");
                         element.AppendChild(element1);
 
                         attribute = xmlDoc.CreateAttribute("source");
 
-                        attribute.Value = "rpf\\" + file.Path.Replace('/', '\\') + "\\" + source.Name;
+                        attribute.Value = "rpf\\" + arc.Name + "\\" + source.Name.Trim('\\');
 
                         element1.Attributes.Append(attribute);
 
                         element1.InnerText = source.Name;
                     }
 
-                    foreach (var n in file.NestedArchives)
+                    foreach (var n in arc.NestedArchives)
                     {
-                        foreach (var innerN in GetNestedArchives(n))
+                        foreach (var innerN in n.GetNodes())
                         {
                             element1 = xmlDoc.CreateElement("archive");
                             element.AppendChild(element1);
 
                             attribute = xmlDoc.CreateAttribute("path");
-                            attribute.Value = innerN.Path.Replace('/', '\\');
+                            attribute.Value = innerN.Path;
 
                             element1.Attributes.Append(attribute);
 
@@ -352,7 +418,7 @@ namespace OIVPackageEditor
 
                                 attribute = xmlDoc.CreateAttribute("source");
 
-                                attribute.Value = "rpf\\" + file.Path.Replace('/', '\\') + "\\" + f.Name;
+                                attribute.Value = "rpf\\" + arc.Name + "\\" + f.Name.Trim('\\');
 
                                 element2.Attributes.Append(attribute);
 
@@ -370,56 +436,39 @@ namespace OIVPackageEditor
             }
         }
 
-        public static IEnumerable<OIVArchive> GetNestedArchives(OIVArchive node)
+        private void WriteFileContent(string fileName, OIVPackageInfo data)
         {
-            if (node == null)
+            if (File.Exists(filePath))
             {
-                yield break;
-            }
-            yield return node;
-            foreach (var n in node.NestedArchives)
-            {
-                foreach (var innerN in GetNestedArchives(n))
+                try
                 {
-                    yield return innerN;
+                    File.Delete(filePath);
+                }
+
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine("Failed to remove exiting package file. Access to the path was denied.");
+                    return;
+                }
+
+                catch (Exception e)
+                {
+                    Console.WriteLine("Failed to remove exiting package file.\n" + e.Message);
+                    return;
                 }
             }
-        }
-
-        public static IEnumerable<OIVArchiveFile> GetNestedFiles(OIVArchive node)
-        {
-            if (node == null)
-            {
-                yield break;
-            }
-
-            foreach (var file in node.SourceFiles)
-                yield return file;
-
-            foreach (var n in node.NestedArchives)
-            {
-                foreach (var innerN in GetNestedArchives(n))
-                {
-                    foreach (var file in innerN.SourceFiles)
-                        yield return file;
-                }
-            }
-        }
-
-        private void WriteFileContent(string filePath, string mdPath, OIVPackageInfo data)
-        {
-            if (File.Exists(filePath)) File.Delete(filePath);
 
             using (var zipfile = ZipFile.Open(filePath, ZipArchiveMode.Create))
             {
-                zipfile.CreateEntryFromFile(mdPath, "assembly.xml");
+                zipfile.CreateEntryFromFile(workingDir + "assembly.xml", "assembly.xml");
                 zipfile.CreateEntry("content/");
 
                 if (data.GenericFiles?.Count > 0)
                 {
                     foreach (var file in data.GenericFiles)
                     {
-                        zipfile.CreateEntryFromFile(file.Source, "content/file/" + file.Destination);
+                        zipfile.CreateEntryFromFile(file.Source, "content/file/" + 
+                            file.Destination.TrimEnd('\\').Replace('\\', '/'));
                     }
                 }
 
@@ -427,16 +476,84 @@ namespace OIVPackageEditor
                 {
                     foreach (var archive in data.Archives)
                     {
-                        foreach (var file in GetNestedFiles(archive))
+                        foreach (var file in archive.GetNestedFiles())
                         {
-                            zipfile.CreateEntryFromFile(file.Source, "content/rpf/" + archive.Path + "/" + file.Name);
+                            zipfile.CreateEntryFromFile(file.Source, "content/rpf/" + 
+                                (archive.Name + "/" + file.Name.Trim('\\')).Replace('\\', '/'));
                         }
                     }
                 }
 
+                var userPath = data.IconPath;
+
+                if (data.IconPath?.Length > 0)
+                {
+                    var image = Image.FromFile(userPath);
+
+                    var filename = data.IconPath.Substring(data.IconPath.LastIndexOf('\\') + 1);
+
+                    if (filename != "icon.png")
+                    {
+                        string path = workingDir + "icon.png";
+                        File.Copy(userPath, path, true);
+                        userPath = path;
+                    }
+
+                    if (image.HorizontalResolution != 128 || image.VerticalResolution != 128)
+                    {
+                        userPath = FixImageRes(userPath);
+                    }
+                }
+
+                else
+                {
+                    userPath = workingDir + "icon.png";
+
+                    using (Image image = Properties.Resources.Package)
+                    {
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                            image.Save(userPath, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                    }
+                }
+
+                zipfile.CreateEntryFromFile(userPath, "icon.png");
+
                 zipfile.Dispose();
             }
         }
+
+        private string FixImageRes(string imagePath)
+        {
+            var temp = workingDir + "icon.png";
+
+            using (Image image = new Bitmap(128, 128))
+            {
+                using (Bitmap source = new Bitmap(imagePath))
+                {
+                    using (var graphics = Graphics.FromImage(image))
+                    {
+                        graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+                        graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                        graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
+                        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        graphics.DrawImage(source, 0, 0, image.Width, image.Height);
+                    }
+                }
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                    image.Save(temp, System.Drawing.Imaging.ImageFormat.Png);
+                }
+            }
+
+            return temp;
+        }
+
 
         private static void GetArchiveChildren(string filePath, XmlNode node, ref OIVArchive root)
         {
@@ -452,7 +569,7 @@ namespace OIVPackageEditor
                 {
                     var archive = new OIVArchive();
 
-                    archive.Path = subNode.Attributes.GetNamedItem("path").Value.Replace('\\', '/');
+                    archive.Path = subNode.Attributes.GetNamedItem("path").Value;
 
                     archive.CreateIfNotExist = Convert.ToBoolean(subNode.Attributes.GetNamedItem("createIfNotExist").Value);
 
@@ -551,11 +668,11 @@ namespace OIVPackageEditor
 
             info.BlackTextEnabled = Convert.ToBoolean(element1.Attributes.GetNamedItem("useBlackTextColor").Value);
 
-            info.HeaderBackground = System.Drawing.ColorTranslator.FromHtml(element1.InnerText.Replace('$', '#'));
+            info.HeaderBackground = ColorTranslator.FromHtml(element1.InnerText.Replace('$', '#'));
 
             element1 = element.SelectSingleNode("iconBackground");
 
-            info.IconBackground = System.Drawing.ColorTranslator.FromHtml(element1.InnerText.Replace('$', '#'));
+            info.IconBackground = ColorTranslator.FromHtml(element1.InnerText.Replace('$', '#'));
 
             element1 = packageRoot.SelectSingleNode("content");
 
@@ -572,7 +689,7 @@ namespace OIVPackageEditor
                 {
                     var archive = new OIVArchive();
 
-                    archive.Path = node.Attributes.GetNamedItem("path").Value.Replace('\\', '/');
+                    archive.Path = node.Attributes.GetNamedItem("path").Value;
 
                     archive.CreateIfNotExist = Convert.ToBoolean(node.Attributes.GetNamedItem("createIfNotExist").Value);
 
@@ -585,6 +702,11 @@ namespace OIVPackageEditor
             }
 
             data = info;
+        }
+
+        public void Dispose()
+        {
+            RemoveWorkingDir();
         }
 
         public enum OIVPackageFormat

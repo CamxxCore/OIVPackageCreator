@@ -23,10 +23,53 @@ namespace OIVPackageEditor
             wizard1.FinishButtonClick += FinishButtonClick;
             listBox2.SelectedIndexChanged += ListBox2_SelectedIndexChanged;
             textBox1.LostFocus += TextBox1_LostFocus;
+            textBox1.PreviewKeyDown += TextBox1_PreviewKeyDown;
+            textBox1.AutoCompleteCustomSource = Properties.Settings.Default.autoCompGenPaths;
+        }
+
+        private void TextBox1_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Tab)
+            {
+                e.IsInputKey = true;
+                textBox1.SelectionStart = textBox1.Text.Length;
+                textBox1.SelectionLength = 0;
+            }
+        }
+
+        private void SaveCommonPath(string path)
+        {
+            Properties.Settings.Default.autoCompGenPaths =
+                Properties.Settings.Default.autoCompGenPaths ??
+                new AutoCompleteStringCollection();
+
+            if (!Properties.Settings.Default.autoCompGenPaths.Contains(path))
+            {
+                Properties.Settings.Default.autoCompGenPaths.Add(path);
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void FinishButtonClick(object sender, CancelEventArgs e)
         {
+            if (files.Count <= 0)
+            {
+                MessageBox.Show("No files were selected.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            foreach (var file in files)
+            {
+                if (file.Destination?.Length <= 0)
+                {
+                    MessageBox.Show(string.Format("Invalid path specified for file at {0}", file.Source), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                file.Destination = file.Destination.Replace('/', '\\');
+                SaveCommonPath(file.Destination);
+            }
+
             Finished?.Invoke(this, files.ToArray());
             Close();
         }
@@ -36,12 +79,14 @@ namespace OIVPackageEditor
             if (listBox2.SelectedIndex < 0)
             {
                 foreach (var item in files)
-                    item.Destination = textBox1.Text;
+                    item.Destination = 
+                        textBox1.Text.Replace('/', '\\').TrimEnd('\\') + "\\" + item.Name;
             }
 
             else
             {
-                files[listBox2.SelectedIndex].Destination = textBox1.Text;
+                files[listBox2.SelectedIndex].Destination = 
+                    textBox1.Text.Replace('/', '\\').TrimEnd('\\') + "\\"  + files[listBox2.SelectedIndex].Name;
             }
         }
 
@@ -74,6 +119,7 @@ namespace OIVPackageEditor
             }
 
             listBox1.Items.Clear();
+
             listBox2.Items.Clear();
 
             foreach (var file in files)
@@ -81,7 +127,6 @@ namespace OIVPackageEditor
                 var filename = file.Source.Substring(file.Source.LastIndexOf("\\") + 1);
 
                 listBox1.Items.Add(filename);
-
                 listBox2.Items.Add(filename);
             }
         }

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -31,6 +27,18 @@ namespace OIVPackageEditor
             wizard1.CancelButtonClick += CancelButtonClick1;
             wizard1.FinishButtonClick += FinishButtonClick;
             wizardPage3.NextButtonClick += NextButtonClick;
+            textBox1.PreviewKeyDown += TextBox1_PreviewKeyDown;
+            textBox1.AutoCompleteCustomSource = Properties.Settings.Default.autoCompArcPaths;
+        }
+
+        private void TextBox1_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Tab)
+            {
+                e.IsInputKey = true;
+                textBox1.SelectionStart = textBox1.Text.Length;
+                textBox1.SelectionLength = 0;
+            }
         }
 
         private void NextButtonClick(object sender, CancelEventArgs e)
@@ -51,13 +59,36 @@ namespace OIVPackageEditor
             archive.Version = type;
         }
 
+        private void SaveCommonPath(string path)
+        {
+            Properties.Settings.Default.autoCompArcPaths = 
+                Properties.Settings.Default.autoCompArcPaths ?? 
+                new AutoCompleteStringCollection();
+
+            if (!Properties.Settings.Default.autoCompArcPaths.Contains(path))
+            {
+                Properties.Settings.Default.autoCompArcPaths.Add(path);
+                Properties.Settings.Default.Save();
+            }
+        }
+
         private void FinishButtonClick(object sender, CancelEventArgs e)
         {
             string fullPath = textBox1.Text.Trim();
 
-            if (fullPath.Length <= 0)
+            SaveCommonPath(fullPath);
+
+            fullPath = fullPath.Replace('/', '\\');
+
+            if (fullPath.Length <= 0 || !fullPath.Contains(".rpf"))
             {
                 MessageBox.Show("Invalid archive path.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (files.Count <= 0)
+            {
+                MessageBox.Show("No files were selected.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -77,7 +108,7 @@ namespace OIVPackageEditor
             {
                 subStr = subStr.Substring(startIndex, subStr.Length - startIndex);
                 endIndex = subStr.IndexOf(".rpf") + 4;
-                var subArchivePath = subStr.Substring(0, endIndex).TrimStart('/');
+                var subArchivePath = subStr.Substring(0, endIndex).TrimStart('\\');
                 startIndex = endIndex;
                 var subArchive = new OIVArchive(archive.Version, new List<OIVArchiveFile>(), subArchivePath, false);
                 currentNode.NestedArchives.Add(subArchive);
@@ -85,7 +116,13 @@ namespace OIVPackageEditor
             }
 
             foreach (var file in files)
-                currentNode.Add(file, file.Substring(file.LastIndexOf("\\") + 1));
+            {
+                var innerPath = fullPath.Substring(fullPath.LastIndexOf(".rpf") + 4);
+                if (innerPath.Length > 0 && !innerPath.EndsWith("\\"))
+                    innerPath += "\\";
+                currentNode.Add(file, innerPath + file.Substring(file.LastIndexOf("\\") + 1));
+
+            }
 
             Finished?.Invoke(this, archive);
             Close();

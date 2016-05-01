@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OIVPackageEditor
+﻿namespace OIVPackageEditor
 {
     public class OIVArchiveFile
     {
@@ -15,7 +9,7 @@ namespace OIVPackageEditor
         {
             get
             {
-                return string.Format("{0}/{1}", Parent.Path, Name);
+                return string.Format("{0}\\{1}", Parent.Path, Name);
             }
         }
 

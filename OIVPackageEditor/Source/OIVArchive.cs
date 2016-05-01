@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace OIVPackageEditor
 {
@@ -15,6 +11,11 @@ namespace OIVPackageEditor
         public List<OIVArchive> NestedArchives { get; set; } = new List<OIVArchive>();
 
         public string Path { get; set; }
+
+        /// <summary>
+        /// Archive name 
+        /// </summary>
+        public string Name { get { return Path.Substring(Path.LastIndexOf('/') + 1); } }
 
         public bool CreateIfNotExist { get; set; }
 

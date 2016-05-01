@@ -252,7 +252,7 @@
             this.wizardPage2.Controls.Add(this.listBox2);
             this.wizardPage2.Location = new System.Drawing.Point(7, 72);
             this.wizardPage2.Name = "wizardPage2";
-            this.wizardPage2.PageDescription = "Here you can specify the full path to the archive to be used on installation.";
+            this.wizardPage2.PageDescription = "Here you can specify the full path to be used on installation.";
             this.wizardPage2.PageTitle = "Destination Path";
             this.wizardPage2.Size = new System.Drawing.Size(493, 210);
             // 
@@ -277,16 +277,20 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(13, 162);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(385, 13);
+            this.label1.Size = new System.Drawing.Size(416, 13);
             this.label1.TabIndex = 7;
-            this.label1.Text = "Archive Path  (Ex:  \"update/update.rpf/common/data/levels/gta5/vehicles.rpf\")";
+            this.label1.Text = "File or Archive Path  (Ex:  \"update/update.rpf/common/data/levels/gta5/vehicles.r" +
+    "pf\")";
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(16, 187);
+            this.textBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.textBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.textBox1.Location = new System.Drawing.Point(17, 187);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(459, 20);
+            this.textBox1.Size = new System.Drawing.Size(457, 20);
             this.textBox1.TabIndex = 6;
+            this.textBox1.TabStop = false;
             // 
             // listBox2
             // 
@@ -303,6 +307,10 @@
             this.ClientSize = new System.Drawing.Size(507, 340);
             this.Controls.Add(this.wizard1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(523, 378);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(523, 378);
             this.Name = "AddArchiveFileWizard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Add Archive File Wizard";

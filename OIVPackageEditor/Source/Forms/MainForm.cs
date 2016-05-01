@@ -2,7 +2,6 @@
 using DevComponents.DotNetBar;
 using System.Drawing;
 using System.Linq;
-using System.Collections.Generic;
 using System;
 
 namespace OIVPackageEditor
@@ -16,11 +15,17 @@ namespace OIVPackageEditor
         {
             InitializeComponent();
             propertyGrid1.SetParent(this);
+            Properties.Settings.Default.Upgrade();
             superTabControl1.SelectedTabChanged += SelectedTabChanged;
             colorPickerButton1.SelectedColorChanged += ColorPickerButton1_SelectedColorChanged;
             colorPickerButton2.SelectedColorChanged += ColorPickerButton2_SelectedColorChanged;
-            SetupGridViewItems();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
             SetupTabSize();
+            propertyGrid1.SelectedObject = info;
+            base.OnLoad(e);
         }
 
         private void ColorPickerButton1_SelectedColorChanged(object sender, EventArgs e)
@@ -42,7 +47,6 @@ namespace OIVPackageEditor
         private void SelectedTabChanged(object sender, SuperTabStripSelectedTabChangedEventArgs e)
         {
             SetupTabSize();
-
             if (superTabControl1.SelectedTabIndex == 0)
                 propertyGrid1.Focus();
         }
@@ -52,28 +56,22 @@ namespace OIVPackageEditor
             switch (superTabControl1.SelectedTabIndex)
             {
                 case 0: MinimumSize = MaximumSize = Size = new Size(544, 582); break;
-                case 1: MinimumSize = MaximumSize = Size = new Size(544, 400); break;
-                case 2: MinimumSize = MaximumSize = Size = new Size(544, 230); break;
+                case 1: MinimumSize = MaximumSize = Size = new Size(544, 389); break;
+                case 2: MinimumSize = MaximumSize = Size = new Size(382, 290); break;
             }
-        }
-
-        public void SetupGridViewItems()
-        {
-            propertyGrid1.SelectedObject = info;
         }
 
         private void GenericContentWz_Finished(object sender, OIVGenericFile[] files)
         {
-            foreach (var f in files)
+            foreach (var file in files)
             {
                 listBox1.Items.Add(string.Format("{0} -> {1}",
-                    f.Source.Substring(f.Source.LastIndexOf('\\') + 1),
-                    f.Destination));
+                    file.Source.Substring(file.Source.LastIndexOf('\\') + 1),
+                    file.Destination));
             }
 
             info = info ?? new OIVPackageInfo();
             info.GenericFiles.AddRange(files);
-
             wizardActive = false;
         }
 
@@ -84,10 +82,9 @@ namespace OIVPackageEditor
                 if (ar.SourceFiles == null) continue;
 
                 foreach (var f in ar.SourceFiles)
-                    listBox1.Items.Add(string.Format("{0} -> {1}/{2}",
+                    listBox1.Items.Add(string.Format("{0} -> {1}",
                         f.Source.Substring(f.Source.LastIndexOf('\\') + 1),
-                        ar.Path,
-                        f.Name));
+                        f.FullPath).Replace("\\\\", "\\"));
             }
 
             info = info ?? new OIVPackageInfo();
@@ -119,13 +116,13 @@ namespace OIVPackageEditor
             wizardActive = false;
         }
 
-        private void buttonX3_Click(object sender, EventArgs e)
+        private async void buttonX3_Click(object sender, EventArgs e)
         {
             if (info == null) return;
 
             using (var sfd = new SaveFileDialog { Filter = "OpenIV Archive Files (*.oiv)|*.oiv|All files (*.*)|*.*" })
             {
-                sfd.FileName = info.Name ?? "modname" + ".oiv";
+                sfd.FileName = info.Name ?? "package.oiv";
 
                 var result = sfd.ShowDialog();
 
@@ -133,8 +130,14 @@ namespace OIVPackageEditor
                 {
                     case DialogResult.Cancel: break;
                     case DialogResult.OK:
-                        var manager = new OIVPackageManager(sfd.FileName);
-                        manager.CreatePackage(info);
+                        Enabled = false;
+                        using (var manager = new OIVPackageManager(sfd.FileName))
+                        {
+                            await manager.ExportPackage(info);
+                            manager.Dispose();
+                        }
+                        Enabled = true;
+                        MessageBox.Show(string.Format("Successfully exported to {0}.", sfd.FileName));
                         break;
                 }
 
@@ -142,13 +145,13 @@ namespace OIVPackageEditor
             }
         }
 
-        private void buttonX2_Click(object sender, EventArgs e)
+        private async void buttonX2_Click(object sender, EventArgs e)
         {
             if (info == null) return;
 
             string filename = "";
 
-            using (var ofd = new OpenFileDialog())
+            using (var ofd = new OpenFileDialog { Filter = "OpenIV Archive Files (*.oiv)|*.oiv|All files (*.*)|*.*" })
             {
                 var result = ofd.ShowDialog();
 
@@ -167,7 +170,9 @@ namespace OIVPackageEditor
 
             var oivpkg = new OIVPackageManager(filename);
 
-            info = oivpkg.ReadPackage();
+            Enabled = false;
+
+            info = await oivpkg.ReadPackage();
 
             propertyGrid1.SelectedObject = info;
 
@@ -187,32 +192,87 @@ namespace OIVPackageEditor
                 foreach (var f in a.GetNestedFiles())
                     listBox1.Items.Add(string.Format("{0} -> {1}",
                         f.Source.Substring(f.Source.LastIndexOf('\\') + 1),
-                        f.FullPath));
+                        f.FullPath).Replace("\\\\", "\\"));
             }
 
             colorPickerButton1.SelectedColor = info.IconBackground;
 
             colorPickerButton2.SelectedColor = info.HeaderBackground;
+
+            checkBoxX1.Checked = info.BlackTextEnabled;
+
+            if (info.IconPath?.Length > 0)
+            {
+                var image = Image.FromFile(info.IconPath);
+
+                pictureBox1.Image = image;
+                pictureBox1.Refresh();
+            }
+
+            Enabled = true;
         }
 
         private void buttonX1_Click(object sender, EventArgs e)
         {
             if (listBox1.SelectedIndex < 0) return;
 
-            List<OIVArchiveFile> foundFiles = new List<OIVArchiveFile>();
+            var str = listBox1.SelectedItem as string;
+
+            bool foundIt = false;
 
             foreach (var a in info.Archives)
             {
-                foreach (var f in a.GetNestedFiles())
-                    if ((listBox1.SelectedItem as string).Contains(f.FullPath))
-                        foundFiles.Add(f);
+                var files = a.GetNestedFiles().ToArray();
+
+                foreach (var f in files)
+                    if (str.Contains(f.FullPath.Replace("\\\\", "\\")))
+                    {
+                        foundIt = true;
+                        f.Parent.SourceFiles.Remove(f);
+                    }
             }
 
-            if (foundFiles.Count <= 0) return;
+            for (int i = info.GenericFiles.Count - 1; i >= 0; i--)
+            {
+                if (str.Contains(info.GenericFiles[i].Destination))
+                {
+                    foundIt = true;
+                    info.GenericFiles.RemoveAt(i);
+                }
+            }
 
-            foundFiles.ForEach(x => x.Parent.SourceFiles.Remove(x));
+            if (foundIt)
+                listBox1.Items.RemoveAt(listBox1.SelectedIndex);
+            else MessageBox.Show("Error removing the file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
 
-            listBox1.Items.RemoveAt(listBox1.SelectedIndex);
+        private void buttonX4_Click(object sender, EventArgs e)
+        {
+            if (info == null) return;
+
+            using (var ofd = new OpenFileDialog() { Filter = "PNG Image Files (*.png)|*.png" })
+            {
+                var result = ofd.ShowDialog();
+
+                switch (result)
+                {
+                    case DialogResult.Cancel: break;
+                    case DialogResult.OK:
+                        var image = Image.FromFile(ofd.FileName);
+                        info.IconPath = ofd.FileName;
+                        pictureBox1.Image = Image.FromFile(ofd.FileName);
+                        pictureBox1.Refresh();
+                        break;
+                }
+
+                ofd.Dispose();
+            }    
+        }
+
+        private void checkBoxX1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (info == null) return;
+            info.BlackTextEnabled = checkBoxX1.Checked;
         }
     }
 }

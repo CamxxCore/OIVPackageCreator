@@ -36,6 +36,15 @@
     <ApplicationIcon>package-x-generic.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DevComponents.DotNetBar2, Version=10.0.0.3, Culture=neutral, PublicKeyToken=c39c3242a43eee2b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -44,6 +53,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
@@ -57,29 +67,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddArchiveFileWizard.cs">
+    <Compile Include="Source\Forms\AddArchiveFileWizard.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddArchiveFileWizard.Designer.cs">
+    <Compile Include="Source\Forms\AddArchiveFileWizard.Designer.cs">
       <DependentUpon>AddArchiveFileWizard.cs</DependentUpon>
     </Compile>
-    <Compile Include="AddGenericFileWizard.cs">
+    <Compile Include="Source\Forms\AddGenericFileWizard.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddGenericFileWizard.Designer.cs">
+    <Compile Include="Source\Forms\AddGenericFileWizard.Designer.cs">
       <DependentUpon>AddGenericFileWizard.cs</DependentUpon>
     </Compile>
-    <Compile Include="OIVArchiveFile.cs" />
-    <Compile Include="OIVArchive.cs" />
-    <Compile Include="OIVGenericFile.cs" />
-    <Compile Include="OIVPackageManager.cs" />
-    <Compile Include="MainForm.cs">
+    <Compile Include="Source\OIVArchiveFile.cs" />
+    <Compile Include="Source\OIVArchive.cs" />
+    <Compile Include="Source\OIVGenericFile.cs" />
+    <Compile Include="Source\OIVPackageManager.cs" />
+    <Compile Include="Source\Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
+    <Compile Include="Source\Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="OIVPackageInfo.cs" />
+    <Compile Include="Source\OIVPackageInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -91,20 +101,20 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Util.cs" />
-    <Compile Include="WizardSplashPage.cs">
+    <Compile Include="Source\Forms\WizardSplashPage.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WizardSplashPage.Designer.cs">
+    <Compile Include="Source\Forms\WizardSplashPage.Designer.cs">
       <DependentUpon>WizardSplashPage.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AddArchiveFileWizard.resx">
+    <EmbeddedResource Include="Source\Forms\AddArchiveFileWizard.resx">
       <DependentUpon>AddArchiveFileWizard.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="AddGenericFileWizard.resx">
+    <EmbeddedResource Include="Source\Forms\AddGenericFileWizard.resx">
       <DependentUpon>AddGenericFileWizard.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
+    <EmbeddedResource Include="Source\Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -112,10 +122,11 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="WizardSplashPage.resx">
+    <EmbeddedResource Include="Source\Forms\WizardSplashPage.resx">
       <DependentUpon>WizardSplashPage.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="ClassDiagram1.cd" />
+    <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -131,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="package-x-generic.ico" />
+    <None Include="Package.png" />
     <None Include="Resources\Minus_blue.svg.png" />
     <None Include="Resources\Plus_blue.svg.png" />
   </ItemGroup>

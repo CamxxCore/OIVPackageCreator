@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.Design;
+using System.Drawing.Design;
 using System.Collections.Generic;
 using System.Drawing;
 using System;
@@ -33,6 +35,13 @@ namespace OIVPackageEditor
         [Description("The target Game ID. May be one of the following values: Five, IV, EFLC, Payne")]
         [Required(ErrorMessage = "PackageAttributes.Target is required.")]
         public string Target { get; set; } = "Five";
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [Category("Package Attributes")]
+        [DisplayName("Package Icon")]
+        [Description("The icon representing this mod. Must be exactly 128×128 (px) size.")]
+        public string IconPath { get; set; }
 
         #endregion
 
@@ -126,6 +135,7 @@ namespace OIVPackageEditor
         [DisplayName("Description Text")]
         [Description("The description of mod package. No length limitation. Line breaks can be used.")]
         [Required(ErrorMessage = "Description.DescriptionText is required.")]
+        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         public string Description { get; set; }
 
         [Browsable(true)]
@@ -151,6 +161,7 @@ namespace OIVPackageEditor
         [Category("Large Description")]
         [DisplayName("Description Text")]
         [Description("Optional additional description of mod package. No length limitation. Line breaks can be used. For example, can be used for “Version history” and other stuff.")]
+        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         public string LDDescription { get; set; }
 
         [Browsable(true)]
@@ -183,6 +194,7 @@ namespace OIVPackageEditor
         [Category("License")]
         [DisplayName("License Text")]
         [Description("Optional mod licence. No length limitation. Line breaks can be used.")]
+        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         public string License { get; set; }
 
         [Browsable(true)]

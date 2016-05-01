@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OIVPackageEditor
+﻿namespace OIVPackageEditor
 {
     public class OIVGenericFile
     {
         public string Source { get; set; }
         public string Destination { get; set; }
+
+        /// <summary>
+        /// File name 
+        /// </summary>
+        public string Name { get { return Source.Substring(Source.LastIndexOf('\\') + 1); } }
 
         public OIVGenericFile()
         {

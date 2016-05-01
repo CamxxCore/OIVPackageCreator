@@ -181,9 +181,11 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(16, 187);
+            this.textBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.textBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.textBox1.Location = new System.Drawing.Point(19, 187);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(459, 20);
+            this.textBox1.Size = new System.Drawing.Size(455, 20);
             this.textBox1.TabIndex = 3;
             // 
             // listBox2
@@ -201,6 +203,10 @@
             this.ClientSize = new System.Drawing.Size(507, 340);
             this.Controls.Add(this.wizard1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(523, 378);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(523, 378);
             this.Name = "AddGenericFileWizard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Add Generic File Wizard";

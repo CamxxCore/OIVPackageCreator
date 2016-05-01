@@ -156,6 +156,10 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label4);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(523, 378);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(523, 378);
             this.Name = "WizardSplashPage";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Add Content Wizard";
